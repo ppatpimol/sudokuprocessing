@@ -8,7 +8,7 @@ let cell_h = (grid_bottom - grid_top) / grid_size;
 let clicked_cell = null;
 let num = [];
 let position_num = [];
-
+ผ
 for(let i = 0; i < grid_size; i++){
     num[i] = [];
     for(let j = 0; j < grid_size; j++){
@@ -111,4 +111,23 @@ function keyPressed(){
         let [row, col] = clicked_cell;
         num[row][col] = parseInt(key);
     }
+}
+function drawNumbers() {
+  textSize(24);
+  textAlign(CENTER, CENTER);
+  for (let row = 0; row < grid_size; row++) {
+    for (let col = 0; col < grid_size; col++) {
+      let n = num[row][col];
+      if (n !== 0) {
+        let x = col * cell_w + cell_w / 2;
+        let y = grid_top + row * cell_h + cell_h / 2;
+        if (fixedCells.has(row * grid_size + col)) {
+          fill(0);
+        } else {
+          fill(50, 100, 255);
+        }
+        text(n, x, y);
+      }
+    }
+  }
 }
