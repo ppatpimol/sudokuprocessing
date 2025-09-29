@@ -10,6 +10,9 @@ let num = [];
 let position_num = [];
 let fixedCells = new Set();
 let selectedNumber = null;
+let selectorTop;
+let selectorH = 50;
+let cellSelectorW;
 for(let i = 0; i < grid_size; i++){
     num[i] = [];
     for(let j = 0; j < grid_size; j++){
@@ -31,10 +34,16 @@ for(let row = 0; row < grid_size; row++){
         
 function setup(){
     createCanvas(canvas_width, canvas_height);
+    cell_w = canvas_width / grid_size;
+    cell_h = (grid_bottom - grid_top) / grid_size;
+    cellSelectorW = canvas_width / grid_size;
+    selectorTop = grid_bottom + 20;
+    generatePuzzle();
 }
 
 function draw(){
     draw_grid();
+    
     
 }
 
@@ -99,23 +108,51 @@ function culculate_box(Xuser,Yuser,x,y,x2,y2){
 }
         
 function mousePressed(){
-    for(let row = 0; row < grid_size; row++){//loop Matrix 9x9
-        for(let col = 0; col < grid_size; col++){
-            let [x , y , x2 , y2] = position_num[row][col] //assign multiple variable from position_num like Ex. position_num[0][0] is [12,23,24,54] then x = 12 , y = 23 , x2 =24 ,y2 = 54 
-            if(culculate_box(mouseX,mouseY,x,y,x2,y2)){
-                clicked_cell = [row,col];
-            }
+    for (let row = 0; row < grid_size; row++) {
+      for (let col = 0; col < grid_size; col++) {
+        let [x, y, x2, y2] = position_num[row][col];
+        if (culculate_box(mouseX, mouseY, x, y, x2, y2)) {
+          if (!fixedCells.has(row * grid_size + col)) {
+            clicked_cell = [row, col];
+          }
+          return;
         }
+      }
+    }
+    if (mouseY >= selectorTop && mouseY <= selectorTop + selectorH) {
+      for (let i = 0; i < 9; i++) {
+        let x = i * cellSelectorW;
+        if (mouseX >= x && mouseX <= x + cellSelectorW) {
+          selectedNumber = i + 1;
+          if (clicked_cell) {
+            let [row, col] = clicked_cell;
+            if (!fixedCells.has(row * grid_size + col)) {
+              num[row][col] = selectedNumber;
+            }
+          }
+          return;
+        }
+      }
     }
 }
 
 function keyPressed(){
-    num;
-    if(clicked_cell != null){
-        let [row, col] = clicked_cell;
-        num[row][col] = parseInt(key);
+    if (clicked_cell) {
+      let [row, col] = clicked_cell;
+      if (!fixedCells.has(row * grid_size + col)) {
+        if (key >= '1' && key <= '9') {
+          num[row][col] = parseInt(key);
+        } else if (key === '0' || key === 'Backspace' || key === 'Delete') {
+          num[row][col] = 0;
+        }
+      }
     }
+    if (key === 'r' || key === 'R') {
+    generatePuzzle();
+    clicked_cell = null;
+    selectedNumber = null;
 }
+ }
 function drawNumbers() {
   textSize(24);
   textAlign(CENTER, CENTER);
@@ -151,5 +188,55 @@ function drawNumberSelector() {//1-9
     textSize(24);
     textAlign(CENTER, CENTER);
     text(i + 1, x + cellSelectorW / 2, y + selectorH / 2);
+  }
+}
+function generateSolution() {
+  let board = Array.from({ length: grid_size }, () => Array(grid_size).fill(0));
+  solveBoard(board);
+  return board;
+}
+function solveBoard(board) {
+  for (let row = 0; row < grid_size; row++) {
+    for (let col = 0; col < grid_size; col++) {
+      if (board[row][col] === 0) {
+        let nums = shuffle([...Array(9).keys()].map(n => n + 1));
+        for (let numTry of nums) {
+          if (isValid(board, row, col, numTry)) {
+            board[row][col] = numTry;
+            if (solveBoard(board)) return true;
+            board[row][col] = 0;
+          }
+        }
+        return false;
+      }
+    }
+  }
+  return true;
+}
+function isValid(board, row, col, num) {
+  if (board[row].includes(num)) return false;
+  for (let r = 0; r < grid_size; r++) {
+    if (board[r][col] === num) return false;
+  }
+  let startRow = Math.floor(row / 3) * 3;
+  let startCol = Math.floor(col / 3) * 3;
+  for (let r = startRow; r < startRow + 3; r++) {
+    for (let c = startCol; c < startCol + 3; c++) {
+      if (board[r][c] === num) return false;
+    }
+  }
+  return true;
+}
+function generatePuzzle() {
+  num = generateSolution();
+  fixedCells.clear();
+  for (let r = 0; r < grid_size; r++) {
+    for (let c = 0; c < grid_size; c++) {
+      if (random() > 0.6) {
+        fixedCells.add(r * grid_size + c);
+      } else {
+        num[r][c] = 0;
+      }
+    }
   }
 }
