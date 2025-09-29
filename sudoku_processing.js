@@ -8,7 +8,6 @@ let cell_h = (grid_bottom - grid_top) / grid_size;
 let clicked_cell = null;
 let num = [];
 let position_num = [];
-ผ
 for(let i = 0; i < grid_size; i++){
     num[i] = [];
     for(let j = 0; j < grid_size; j++){
@@ -131,3 +130,4 @@ function drawNumbers() {
     }
   }
 }
+
