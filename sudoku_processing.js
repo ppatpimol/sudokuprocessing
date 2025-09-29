@@ -1,13 +1,15 @@
-let canvas_width = 1250;
-let canvas_height = 900;
+let canvas_width = 500;
+let canvas_height = 750;
 let grid_size = 9;
 let grid_top = 20;
-let grid_bottom = 880;
+let grid_bottom = 650;
 let cell_w = canvas_width / grid_size;
 let cell_h = (grid_bottom - grid_top) / grid_size;
 let clicked_cell = null;
 let num = [];
 let position_num = [];
+let fixedCells = new Set();
+let selectedNumber = null;
 for(let i = 0; i < grid_size; i++){
     num[i] = [];
     for(let j = 0; j < grid_size; j++){
@@ -33,6 +35,7 @@ function setup(){
 
 function draw(){
     draw_grid();
+    
 }
 
         
@@ -43,6 +46,8 @@ function draw_grid(){
     if(clicked_cell != null){
         draw_circle_in_cell(...clicked_cell);
     }
+    drawNumbers();
+    drawNumberSelector();
 }
 
 function draw_table(){
@@ -130,4 +135,21 @@ function drawNumbers() {
     }
   }
 }
+function drawNumberSelector() {//1-9
+  let selectorTop = grid_bottom + 20;
+  let selectorH = 50;
+  let cellSelectorW = canvas_width / 9;
 
+  for (let i = 0; i < 9; i++) {
+    let x = i * cellSelectorW;
+    let y = selectorTop;
+    fill(selectedNumber === i + 1 ? 200 : 240);
+    stroke(0);
+    rect(x, y, cellSelectorW, selectorH);
+
+    fill(0);
+    textSize(24);
+    textAlign(CENTER, CENTER);
+    text(i + 1, x + cellSelectorW / 2, y + selectorH / 2);
+  }
+}
