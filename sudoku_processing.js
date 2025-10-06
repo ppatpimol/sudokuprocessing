@@ -305,11 +305,34 @@ function drawErrors() {
   strokeWeight(3);
   for (let r = 0; r < grid_size; r++) {
     for (let c = 0; c < grid_size; c++) {
-      if (isError[r][c] && !fixedCells.has(r * grid_size + c)) {
+      if (num[r][c] == 0 || fixedCells.has(r * grid_size + c)) continue;
+
+      let wrong = false;
+      if (solution && solution[r][c] !== 0) {
+        wrong = (num[r][c] !== solution[r][c]);
+      } else {
+        let v = num[r][c];
+        for (let i = 0; i < grid_size && !wrong; i++) {
+          if (i != c && num[r][i] == v) wrong = true;
+          if (i != r && num[i][c] == v) wrong = true;
+        }
+
+        let sr = Math.floor(r / 3) * 3;
+        let sc = Math.floor(c / 3) * 3;
+        for (let rr = sr; rr < sr + 3 && !wrong; rr++) {
+          for (let cc = sc; cc < sc + 3 && !wrong; cc++) {
+            if ((rr != r || cc != c) && num[rr][cc] == v) wrong = true;
+          }
+        }
+      }
+
+      if (wrong) {
         let x = c * cell_w;
         let y = grid_top + r * cell_h;
         rect(x, y, cell_w, cell_h);
+        rect(x + 2, y + 2, cell_w - 4, cell_h - 4);
       }
     }
   }
+  noStroke();
 }
