@@ -42,18 +42,14 @@ function setup(){
 }
 
 function draw(){
-    draw_grid();
-    
-    
-}
-
-        
+    draw_grid();     
+}        
 function draw_grid(){
     background(255);
     draw_table();
     draw_subtable();
-    if(clicked_cell != null){
-        draw_circle_in_cell(...clicked_cell);
+    if(clicked_cell != null){       
+        draw_highlight(clicked_cell[0], clicked_cell[1]);
     }
     drawNumbers();
     drawNumberSelector();
@@ -90,17 +86,17 @@ function draw_subtable(){
     
     for(let j = 1; j < grid_size; j++){
         if(j % 3 != 0){
-            let y = grid_top + j * cell_h
-            line(0, y, width, y)
+            let y = grid_top + j * cell_h;
+            line(0, y, width, y);
         }
     }
 }
 
-function draw_circle_in_cell(row, col){
-    let x = col * cell_w + cell_w / 2
-    let y = grid_top + row * cell_h + cell_h / 2
-    fill(255, 0, 0)
-    ellipse(x, y, 20, 20)
+function draw_highlight(row, col) {
+  noStroke();
+  fill(255, 200, 200);
+  rect(col * cell_w, grid_top + row * cell_h, cell_w, cell_h);
+  
 }
     
 function culculate_box(Xuser,Yuser,x,y,x2,y2){
