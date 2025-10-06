@@ -1,5 +1,5 @@
-let canvas_width = 500;
-let canvas_height = 750;
+let canvas_width = 750;
+let canvas_height = 1000;
 let grid_size = 9;
 let grid_top = 20;
 let grid_bottom = 650;
@@ -13,12 +13,22 @@ let selectedNumber = null;
 let selectorTop;
 let selectorH = 50;
 let cellSelectorW;
-for(let i = 0; i < grid_size; i++){
-    num[i] = [];
-    for(let j = 0; j < grid_size; j++){
-        num[i][j] = 0;
+let isError = [];
+let solution = [];
+let showCorrect = false;
+let btnW = 160, btnH = 45;
+let resetX = 60, resetY;
+let showX, showY;
+for (let r = 0; r < grid_size; r++) {
+    num[r] = [];
+    isError[r] = [];
+    solution[r] = [];
+    for (let c = 0; c < grid_size; c++) {
+      num[r][c] = 0;
+      isError[r][c] = false;
+      solution[r][c] = 0;
     }
-}
+ }
 
 for(let row = 0; row < grid_size; row++){
     let row_pos = [];//Create A Blank Column to recieve a box position 
@@ -39,6 +49,10 @@ function setup(){
     cellSelectorW = canvas_width / grid_size;
     selectorTop = grid_bottom + 20;
     generatePuzzle();
+    textAlign(CENTER, CENTER);
+    resetY = grid_bottom + 100;
+    showY  = grid_bottom + 100;
+    showX  = 280;
 }
 
 function draw(){
@@ -53,6 +67,8 @@ function draw_grid(){
     }
     drawNumbers();
     drawNumberSelector();
+    drawErrors();
+    drawButtons();
 }
 
 function draw_table(){
@@ -130,6 +146,23 @@ function mousePressed(){
         }
       }
     }
+      // Reset button
+    if (inBox(mouseX, mouseY, resetX, resetY, resetX + btnW, resetY + btnH)) {
+      generatePuzzle();
+      clicked_cell = null;
+      selectedNumber = null;
+      showCorrect = false;
+      for (let i = 0; i < grid_size; i++)
+        for (let j = 0; j < grid_size; j++)
+          isError[i][j] = false;
+      return;
+    }
+
+    // Show Correct button
+    if (inBox(mouseX, mouseY, showX, showY, showX + btnW, showY + btnH)) {
+      showCorrect = !showCorrect;
+      return;
+    }
 }
 
 function keyPressed(){
@@ -158,7 +191,9 @@ function drawNumbers() {
       if (n !== 0) {
         let x = col * cell_w + cell_w / 2;
         let y = grid_top + row * cell_h + cell_h / 2;
-        if (fixedCells.has(row * grid_size + col)) {
+        if (showCorrect && n === solution[row][col]) {
+          fill(0, 180, 0); // green
+        } else if (fixedCells.has(row * grid_size + col)) {
           fill(0);
         } else {
           fill(50, 100, 255);
@@ -224,7 +259,8 @@ function isValid(board, row, col, num) {
   return true;
 }
 function generatePuzzle() {
-  num = generateSolution();
+  solution = generateSolution();
+  num = JSON.parse(JSON.stringify(solution));
   fixedCells.clear();
   for (let r = 0; r < grid_size; r++) {
     for (let c = 0; c < grid_size; c++) {
@@ -232,6 +268,47 @@ function generatePuzzle() {
         fixedCells.add(r * grid_size + c);
       } else {
         num[r][c] = 0;
+      }
+      isError[r][c] = false;
+    }
+  }
+}
+function drawButtons() {
+  fill(230);
+  stroke(0);
+  rect(resetX, resetY, btnW, btnH, 10);
+  fill(0);
+  textSize(16);
+  text("Reset Puzzle", resetX + btnW / 2, resetY + btnH / 2);
+
+  fill(showCorrect ? color(150, 255, 150) : 230);
+  stroke(0);
+  rect(showX, showY, btnW, btnH, 10);
+  fill(0);
+  text("Show Correct", showX + btnW / 2, showY + btnH / 2);
+}
+function inBox(mx, my, x, y, x2, y2) {
+  return mx > x && mx < x2 && my > y && my < y2;
+}
+function shuffleNumbers() {
+  let a = [];
+  for (let i = 0; i < 9; i++) a[i] = i + 1;
+  for (let i = 8; i > 0; i--) {
+    let j = Math.floor(random(i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function drawErrors() {
+  noFill();
+  stroke(255, 0, 0);
+  strokeWeight(3);
+  for (let r = 0; r < grid_size; r++) {
+    for (let c = 0; c < grid_size; c++) {
+      if (isError[r][c] && !fixedCells.has(r * grid_size + c)) {
+        let x = c * cell_w;
+        let y = grid_top + r * cell_h;
+        rect(x, y, cell_w, cell_h);
       }
     }
   }
