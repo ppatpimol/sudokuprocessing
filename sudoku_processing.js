@@ -1,8 +1,8 @@
-let canvas_width = 750;
-let canvas_height = 1000;
+let canvas_width =525;
+let canvas_height = 800;
 let grid_size = 9;
-let grid_top = 20;
-let grid_bottom = 650;
+let grid_top =125;
+let grid_bottom = 625;
 let cell_w = canvas_width / grid_size;
 let cell_h = (grid_bottom - grid_top) / grid_size;
 let clicked_cell = null;
@@ -19,6 +19,9 @@ let showCorrect = false;
 let btnW = 160, btnH = 45;
 let resetX = 60, resetY;
 let showX, showY;
+let xflowchart = 650;        
+let yflowchart =50; 
+
 for (let r = 0; r < grid_size; r++) {
     num[r] = [];
     isError[r] = [];
@@ -43,7 +46,7 @@ for(let row = 0; row < grid_size; row++){
 }
         
 function setup(){
-    createCanvas(canvas_width, canvas_height);
+    createCanvas(1000, canvas_height);
     cell_w = canvas_width / grid_size;
     cell_h = (grid_bottom - grid_top) / grid_size;
     cellSelectorW = canvas_width / grid_size;
@@ -56,25 +59,25 @@ function setup(){
 }
 
 function draw(){
-    draw_grid();     
+    background(255);
+    drawflowchart();
+    draw_grid();
 }        
 function draw_grid(){
-    background(255);
     draw_table();
     draw_subtable();
     if(clicked_cell != null){       
-        draw_highlight(clicked_cell[0], clicked_cell[1]);
+        draw_highlight(clicked_cell[0], clicked_cell[1],225,225,225);
     }
     drawNumbers();
     drawNumberSelector();
     drawErrors();
-    drawButtons();
 }
 
 function draw_table(){
     strokeWeight(5);
-    line(0, grid_top, width, grid_top);
-    line(0, grid_bottom, width, grid_bottom);
+    line(0, grid_top,canvas_width, grid_top);
+    line(0, grid_bottom,canvas_width, grid_bottom);
     
     for(let i = 1; i < grid_size; i++){
         if(i % 3 == 0){
@@ -86,9 +89,12 @@ function draw_table(){
     for(let j = 1; j < grid_size; j++){
         if(j % 3 == 0){
             let y = grid_top + j * cell_h;
-            line(0, y, width, y);
+            line(0, y,canvas_width, y);
         }
+        
     }
+    strokeWeight(5);
+    line(canvas_width-1,grid_top,canvas_width-1,grid_bottom);
 }
 
 function draw_subtable(){
@@ -103,7 +109,7 @@ function draw_subtable(){
     for(let j = 1; j < grid_size; j++){
         if(j % 3 != 0){
             let y = grid_top + j * cell_h;
-            line(0, y, width, y);
+            line(0, y,canvas_width, y);
         }
     }
 }
@@ -174,7 +180,7 @@ function keyPressed(){
         } else if (key === '0' || key === 'Backspace' || key === 'Delete') {
           num[row][col] = 0;
         }
-      }
+      }   
     }
     if (key === 'r' || key === 'R') {
     generatePuzzle();
@@ -273,22 +279,9 @@ function generatePuzzle() {
     }
   }
 }
-function drawButtons() {
-  fill(230);
-  stroke(0);
-  rect(resetX, resetY, btnW, btnH, 10);
-  fill(0);
-  textSize(16);
-  text("Reset Puzzle", resetX + btnW / 2, resetY + btnH / 2);
 
-  fill(showCorrect ? color(150, 255, 150) : 230);
-  stroke(0);
-  rect(showX, showY, btnW, btnH, 10);
-  fill(0);
-  text("Show Correct", showX + btnW / 2, showY + btnH / 2);
-}
 function inBox(mx, my, x, y, x2, y2) {
-  return mx > x && mx < x2 && my > y && my < y2;
+    return mx > x && mx < x2 && my > y && my < y2;
 }
 function shuffleNumbers() {
   let a = [];
@@ -335,4 +328,92 @@ function drawErrors() {
     }
   }
   noStroke();
+}
+function drawArrow(x, y1, y2) {
+  let arrowGap = 10;
+  stroke(0);
+  strokeWeight(2);
+  line(x, y1, x, y2 - arrowGap);
+  line(x, y2 - arrowGap, x - 5, y2 - arrowGap - 5);
+  line(x, y2 - arrowGap, x + 5, y2 - arrowGap - 5);
+}
+function start_stop_type(posx, posy, size, word) {
+  fill(255);
+  stroke(0);
+  strokeWeight(2);
+  ellipse(posx, posy, size, size / 2);
+
+  fill(0);
+  textAlign(CENTER, CENTER);
+  textSize(16);
+  text(word, posx, posy);
+
+  return posy + size / 4 + 100;
+}
+function process_type(posx, posy, size, word) {
+  fill(255);
+  stroke(0);
+  strokeWeight(2);
+  rect(posx - size / 2, posy - size / 2, size, size); // centered box
+
+  fill(0);
+  textAlign(CENTER, CENTER);
+  textSize(16);
+  text(word, posx, posy);
+
+  return posy + size / 2 + 100;
+}
+function decision_type(posx, posy, size, word) {
+  fill(255);
+  stroke(0);
+  strokeWeight(2);
+  quad(
+    posx, posy - size / 2,         // top
+    posx + size, posy,             // right
+    posx, posy + size / 2,         // bottom
+    posx - size, posy              // left
+  );
+
+  fill(0);
+  textAlign(CENTER, CENTER);
+  textSize(16);
+  text(word, posx, posy);
+
+  return posy + size / 2 + 100;
+}
+function drawArrowHorizontal(x1, x2, y) {
+  stroke(0);
+  strokeWeight(2);
+  line(x1, y, x2 - 10, y);
+  line(x2 - 10, y, x2 - 15, y - 5);
+  line(x2 - 10, y, x2 - 15, y + 5);
+}
+function text_box(x, y, size, word) {
+  fill(255);
+  stroke(0);
+  rect(x, y, 40, 20);
+  fill(0);
+  textAlign(CENTER, CENTER);
+  textSize(12);
+  text(word, x + 20, y + 10);
+}
+function drawflowchart(){
+    let y1 = start_stop_type(xflowchart, yflowchart, 100, "START");
+    drawArrow(xflowchart, yflowchart + 25, y1 - 50);
+    let y2 = process_type(xflowchart, y1, 100, "Initialize Grid");
+    drawArrow(xflowchart, y1 + 50, y2 - 40);
+    let y3 = process_type(xflowchart, y2, 110, "User Interaction");
+    drawArrow(xflowchart, y2 + 55, y3 - 50);
+    let y4 = decision_type(xflowchart, y3, 100, "Is Solved?");
+    text("TRUE", xflowchart + 25, y4 - 75);
+    drawArrowHorizontal(xflowchart + 100, xflowchart + 200, y3);
+    text("FALSE", xflowchart + 120, y3 - 20);
+    drawArrow(xflowchart + 200, y3, y4 - 50);
+    drawArrow(xflowchart, y3 + 50, y4 - 50);
+    let y5 = process_type(xflowchart, y4, 100, "Show Result");
+    drawArrow(xflowchart, y4 + 50, y5 - 70);
+    drawArrowHorizontal(xflowchart, xflowchart + 200, y5 - 70);
+    let y5alt = process_type(xflowchart + 200, y4, 100, "Show Mistake");
+    drawArrow(xflowchart + 200, y4 + 50, y5 - 50);
+    start_stop_type(xflowchart + 200, y5alt - 25, 100, "END");
 }
