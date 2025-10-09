@@ -40,7 +40,7 @@ for(let row = 0; row < grid_size; row++){
     }
     position_num.push(row_pos)//Store Array in Array Ex. postion_num = [[[2,3,4,5],[?,?,?,?],....],[[2,3,4,5],[?,?,?,?],....]]
 }   
-function setup(){
+function setup(){//Initializes the canvas and game state
     createCanvas(1000, canvas_height);
     cell_w = canvas_width / grid_size;
     cell_h = (grid_bottom - grid_top) / grid_size;
@@ -57,7 +57,7 @@ function draw(){
     drawflowchart();
     draw_grid();
 }        
-function draw_grid(){
+function draw_grid(){//Manages full grid
     draw_table();
     draw_subtable();
     if(clicked_cell != null){       
@@ -69,7 +69,7 @@ function draw_grid(){
     drawErrors();
 }
 
-function draw_table(){
+function draw_table(){//Draws the bold lines for 3*3
     strokeWeight(5);
     line(0, grid_top,canvas_width, grid_top);
     line(0, grid_bottom,canvas_width, grid_bottom);
@@ -89,7 +89,7 @@ function draw_table(){
     line(canvas_width-1,grid_top,canvas_width-1,grid_bottom);
 }
 
-function draw_subtable(){
+function draw_subtable(){//9*9
     strokeWeight(1)
     for(let i = 1; i < grid_size; i++){
         if(i % 3 != 0){
@@ -104,7 +104,7 @@ function draw_subtable(){
         }
     }
 }
-function draw_highlight(row, col) {
+function draw_highlight(row, col) {//Highlights the selected cell in pink
     noStroke();
     fill(255, 200, 200);
     rect(col * cell_w, grid_top + row * cell_h, cell_w, cell_h);  
@@ -112,7 +112,7 @@ function draw_highlight(row, col) {
 function culculate_box(Xuser,Yuser,x,y,x2,y2){
     return(Xuser > x && Xuser < x2 && Yuser > y && Yuser < y2);
 }        
-function mousePressed(){
+function mousePressed(){//Handles mouse clicks to select a cell
     for (let row = 0; row < grid_size; row++) {
         for (let col = 0; col < grid_size; col++) {
             let [x, y, x2, y2] = position_num[row][col];
@@ -142,7 +142,7 @@ function mousePressed(){
     
 }
 
-function keyPressed(){
+function keyPressed(){//insert number (1-9), delete (0/Backspace), or reset (r key).
     if (clicked_cell) {
         let [row, col] = clicked_cell;
         if (!fixedCells.has(row * grid_size + col)) {
@@ -196,12 +196,12 @@ function drawNumberSelector() {//1-9
         text(i + 1, x + cellSelectorW / 2, y + selectorH / 2);
   }
 }
-function generateSolution() {
+function generateSolution() {//Generates a full valid Sudoku solution
     let board = Array.from({ length: grid_size }, () => Array(grid_size).fill(0));
     solveBoard(board);
     return board;
 }
-function solveBoard(board) {
+function solveBoard(board) {//Recursive backtracking function to solve
     for (let row = 0; row < grid_size; row++) {
         for (let col = 0; col < grid_size; col++) {
             if (board[row][col] === 0) {
@@ -219,7 +219,7 @@ function solveBoard(board) {
     }
     return true;
 }
-function isValid(board, row, col, num) {
+function isValid(board, row, col, num) {//Checks if placing num in row, col is valid
     if (board[row].includes(num)) return false;
     for (let r = 0; r < grid_size; r++) {
         if (board[r][col] === num) return false;
@@ -233,7 +233,7 @@ function isValid(board, row, col, num) {
     }
     return true;
 }
-function generatePuzzle() {
+function generatePuzzle() {//using a valid solution/then randomly removes some numbers to create a playable puzzle
     solution = generateSolution();
     num = JSON.parse(JSON.stringify(solution));
     fixedCells.clear();
@@ -251,7 +251,7 @@ function generatePuzzle() {
 function inBox(mx, my, x, y, x2, y2) {
     return mx > x && mx < x2 && my > y && my < y2;
 }
-function shuffleNumbers() {
+function shuffleNumbers() {//Shuffles numbers 1–9 for random
     let a = [];
     for (let i = 0; i < 9; i++) a[i] = i + 1;
     for (let i = 8; i > 0; i--) {
@@ -260,7 +260,7 @@ function shuffleNumbers() {
     }
     return a;
 }
-function drawErrors() {
+function drawErrors() {//Shows red borders around cells with invalid
     noFill();
     stroke(255, 0, 0);
     strokeWeight(3);
@@ -294,7 +294,7 @@ function drawErrors() {
     }  
     noStroke();
 }
-function drawArrow(x, y1, y2) {
+function drawArrow(x, y1, y2) {//Draws vertical and horizontal
     let arrowGap = 10;
     stroke(0);
     strokeWeight(2);
@@ -302,7 +302,7 @@ function drawArrow(x, y1, y2) {
     line(x, y2 - arrowGap, x - 5, y2 - arrowGap - 5);
     line(x, y2 - arrowGap, x + 5, y2 - arrowGap - 5);
 }
-function start_stop_type(posx, posy, size, word) {
+function start_stop_type(posx, posy, size, word) {//Draws start/end 
     fill(255);
     stroke(0);
     strokeWeight(2);
@@ -313,7 +313,7 @@ function start_stop_type(posx, posy, size, word) {
     text(word, posx, posy);
     return posy + size / 4 + 100;
 }
-function process_type(posx, posy, size, word) {
+function process_type(posx, posy, size, word) {//Draws rectangle
     fill(255);
     stroke(0);
     strokeWeight(2);
@@ -324,7 +324,7 @@ function process_type(posx, posy, size, word) {
     text(word, posx, posy);
     return posy + size / 2 + 100;
 }
-function decision_type(posx, posy, size, word) {
+function decision_type(posx, posy, size, word) {//Draws diamond shape
     fill(255);
     stroke(0);
     strokeWeight(2);
@@ -347,7 +347,7 @@ function drawArrowHorizontal(x1, x2, y) {
     line(x2 - 10, y, x2 - 15, y - 5);
     line(x2 - 10, y, x2 - 15, y + 5);
 }
-function text_box(x, y, size, word) {
+function text_box(x, y, size, word) {//Draws small labeled rectangles
     fill(255);
     stroke(0);
     rect(x, y, 40, 20);
@@ -356,7 +356,7 @@ function text_box(x, y, size, word) {
     textSize(12);
     text(word, x + 20, y + 10);
 }
-function drawflowchart(){
+function drawflowchart(){//Draws a full logic flowchart
     let y1 = start_stop_type(xflowchart, yflowchart, 100, "START");
     drawArrow(xflowchart, yflowchart + 25, y1 - 50);
     let y2 = process_type(xflowchart, y1, 100, "Initialize Grid");
@@ -376,7 +376,7 @@ function drawflowchart(){
     drawArrow(xflowchart + 200, y4 + 50, y5 - 50);
     start_stop_type(xflowchart + 200, y5alt - 25, 100, "END");
 }
-function drawhighlightSameNumbers() {
+function drawhighlightSameNumbers() {//Highlights all other cells with the same number
     if (!clicked_cell) return;
     let [selectedRow, selectedCol] = clicked_cell;
     let selectedVal = num[selectedRow][selectedCol];
